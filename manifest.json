@@ -1,0 +1,46 @@
+{
+    "manifest_version": 3,
+    "name": "LinkedIn Feed Rad Libs",
+    "version": "1.0.0",
+    "description": "Transform your LinkedIn feed into a fun, totally not trademarked fill-in-the-blank experience!",
+    "icons": {
+        "16": "icons/icon-16.png",
+        "32": "icons/icon-32.png",
+        "48": "icons/icon-48.png",
+        "96": "icons/icon-96.png",
+        "128": "icons/icon-128.png"
+    },
+    "homepage_url": "https://github.com/radicalgizmos-matt/li-rad-libs",
+    "permissions": [
+        "storage"
+    ],
+    "host_permissions": [
+        "https://www.linkedin.com/feed/*"
+    ],
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "li-rad-libs@radicalgizmos.com"
+        }
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.linkedin.com/feed/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "action": {
+        "default_title": "Open Options"
+    },
+    "options_ui": {
+        "page": "options/options.html"
+    },
+    "background": {
+        "scripts": ["background.js"],
+        "service_worker": "background.js"
+    }
+}
