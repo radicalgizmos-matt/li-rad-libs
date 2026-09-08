@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "LinkedIn Feed Rad Libs",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": "Transform your LinkedIn feed into a fun, totally not trademarked fill-in-the-blank experience!",
     "icons": {
         "16": "icons/icon-16.png",

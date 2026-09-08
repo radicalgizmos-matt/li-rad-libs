@@ -27,11 +27,47 @@ browserApi.storage.local.onChanged.addListener((changes, area) => {
  * Processes the feed by applying substitutions to post and comment elements.
  */
 const processFeed = () => {
+  const postUserTitles = [];
+  const posts = [];
+  const commentUserTitles = [];
+  const comments = [];
+
   //Grab the relevant elements in the feed, which include post user titles, post contents, comment user titles, and comment contents
-  const postUserTitles = document.querySelectorAll('span.update-components-actor__description > span:first-of-type');
-  const posts = document.querySelectorAll('div.feed-shared-update-v2__description > div > span.tvm-parent-container > span');
-  const commentUserTitles = document.querySelectorAll('div.comments-comment-meta__description-subtitle');
-  const comments = document.querySelectorAll('span.comments-comment-item__main-content > div > span');
+
+  //For some reason, an SVG with the duplicated ID "person-accent-4" appears in the feed
+  //This oddity is perfectly placed close enough to the relevant elements to use it as a basis for locating them in a sea of obfuscated CSS classes
+  const personSvgElements = document.querySelectorAll('svg#person-accent-4');
+  personSvgElements.forEach((svg) => {
+    try {
+      //The duplicated SVG and ID is used on other parts of the page, but it's for all of the "you" portions that we don't care about
+      //There's a great-grandparent DIV above the SVG for the "non-you" areas that we want to target
+      const pivotContainer = svg.parentNode.parentNode.parentNode;
+      if (pivotContainer.nodeName === 'DIV') {
+        if (pivotContainer.childNodes.length === 1 && pivotContainer.childNodes[0].nodeName === 'A') {
+          //Comment
+          const commentDiv = pivotContainer.nextSibling;
+          if (commentDiv && commentDiv.nodeName === 'DIV') {
+            commentUserTitles.push(...commentDiv.querySelectorAll(':scope div > div > a > div > div:nth-child(2) > p > span'));
+            comments.push(...commentDiv.querySelectorAll(':scope div:nth-child(2) > div > div > p > span'));
+          }
+        } else {
+          //Post
+          const pHeaderDiv = svg.parentNode.parentNode.nextSibling;
+          if (pHeaderDiv && pHeaderDiv.nodeName === 'DIV') {
+            postUserTitles.push(...pHeaderDiv.querySelectorAll(':scope div > div:nth-child(2) span'));
+          }
+
+          const postPara = pivotContainer.nextSibling;
+          if (postPara && postPara.nodeName === 'P') {
+            posts.push(postPara.firstChild);
+          }
+        }
+      }
+    } catch (error) {
+      // Not sure what we found so just bail out
+      return;
+    }
+  });
 
   //Process each element to apply substitutions
   postUserTitles.forEach(updateElementContent);

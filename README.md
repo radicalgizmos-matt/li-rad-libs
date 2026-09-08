@@ -18,6 +18,3 @@ My LinkedIn feed was boring. I made a tool to make it entertaining.
 
 ## Operation
 Refresh your feed after saving any substitutions to ensure they are applied. Substitutions affect poster titles, post content, commenter titles and comments.
-
-## Misc
-Currently V1 and just a hobby project so there will be bugs...
