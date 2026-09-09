@@ -81,7 +81,7 @@ const processFeed = () => {
  * @param {HTMLElement} element the target element
  */
 const updateElementContent = (element) => {
-  if (!element || !substitutions || substitutions.length === 0) {
+  if (!element || element.dataset.lirldone === '1' || !substitutions || substitutions.length === 0) {
     return;
   }
 
@@ -140,6 +140,9 @@ const updateElementContent = (element) => {
       textNode.nodeValue = textValue;
     }
   });
+
+  //Flag so we don't re-process on next body update
+  element.dataset.lirldone = '1';
 }
 
 // Observe changes to the feed and re-process when new content is added
