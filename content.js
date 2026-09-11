@@ -6,27 +6,25 @@
     replacements: ["sample1", "sample2"],
 };*/
 
-let substitutions = [];
-const browserApi = chrome || browser;
-
-//Try to load the substitutions from storage so we aren't starting from scratch each page load
-browserApi.storage.local.get(['li_rad_libs_subs'], (result) => {
-  substitutions = result.li_rad_libs_subs || [];
-  processFeed();
-});
-
-//Listen for changes to the substitutions configuration and update accordingly
-browserApi.storage.local.onChanged.addListener((changes, area) => {
-  if (area === 'local' && changes.li_rad_libs_subs) {
-    substitutions = changes.li_rad_libs_subs.newValue || [];
-    processFeed();
+/**
+ * Loads substitutions from local storage and processes the feed with them
+ */
+const run = () => {
+  //Prevent the extension from accidentally running on non-feed pages due to dynamic routing without new document navigation
+  if (window.location.pathname === '/' || window.location.pathname === '/feed' || window.location.pathname === '/feed/') {
+    const browserApi = chrome || browser;
+    browserApi.storage.local.get(['li_rad_libs_subs'], (result) => {
+      const substitutions = result.li_rad_libs_subs || [];
+      processFeed(substitutions);
+    });
   }
-});
+}
 
 /**
  * Processes the feed by applying substitutions to post and comment elements.
+ * @param {Array} substitutions the list of substitutions to apply
  */
-const processFeed = () => {
+const processFeed = (substitutions) => {
   const postUserTitles = [];
   const posts = [];
   const commentUserTitles = [];
@@ -70,17 +68,18 @@ const processFeed = () => {
   });
 
   //Process each element to apply substitutions
-  postUserTitles.forEach(updateElementContent);
-  posts.forEach(updateElementContent);
-  commentUserTitles.forEach(updateElementContent);
-  comments.forEach(updateElementContent);
+  postUserTitles.forEach((el) => updateElementContent(el, substitutions));
+  posts.forEach((el) => updateElementContent(el, substitutions));
+  commentUserTitles.forEach((el) => updateElementContent(el, substitutions));
+  comments.forEach((el) => updateElementContent(el, substitutions));
 }
 
 /**
  * Applies the current substitutions configuration to the text content of a given element.
  * @param {HTMLElement} element the target element
+ * @param {Array} substitutions the list of substitutions to apply
  */
-const updateElementContent = (element) => {
+const updateElementContent = (element, substitutions) => {
   if (!element || element.dataset.lirldone === '1' || !substitutions || substitutions.length === 0) {
     return;
   }
@@ -145,6 +144,10 @@ const updateElementContent = (element) => {
   element.dataset.lirldone = '1';
 }
 
-// Observe changes to the feed and re-process when new content is added
-const observer = new MutationObserver(processFeed);
-observer.observe(document.body, { childList: true, subtree: true });
+//Only run if the body exists. This content script will continue running as the DOM changes and process the body when it is available.
+if (document.body) {
+  // Observe changes to the feed and re-process when new content is added
+  const infiniteObserver = new MutationObserver(run);
+  infiniteObserver.observe(document.body, { childList: true, subtree: true });
+  run();
+}
