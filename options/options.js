@@ -62,9 +62,16 @@ const createSubstitutionForm = (sub, index) => {
   headerToggle.className = 'sub-header-toggle';
   headerToggle.textContent = expandedIcon;
 
+  const isExistingData = sub.target && sub.target.trim() !== '';
+
   const headerTitle = document.createElement('span');
   headerTitle.className = 'sub-header-title';
-  headerTitle.textContent = `Substitution ${index + 1}`;
+  headerTitle.textContent = `${index + 1}: `;
+  if (isExistingData) {
+    headerTitle.textContent += `${sub.target}`;
+  } else {
+    headerTitle.textContent += '(No target)';
+  }
   
   // Delete button
   const deleteBtn = document.createElement('button');
@@ -87,7 +94,6 @@ const createSubstitutionForm = (sub, index) => {
   
   // Determine if this form should be collapsed by default
   // Collapse if it has existing data (target is not empty), expand if blank
-  const isExistingData = sub.target && sub.target.trim() !== '';
   if (isExistingData) {
     contentContainer.style.display = 'none';
     headerToggle.textContent = collapsedIcon;
@@ -339,6 +345,7 @@ saveBtn.addEventListener('click', () => {
       saveMsg.classList.remove('visible');
       saveMsg.textContent = '';
     }, 1800);
+    renderSubstitutions();
   });
 });
 
