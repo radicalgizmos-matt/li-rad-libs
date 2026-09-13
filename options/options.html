@@ -7,9 +7,16 @@
         <h3>Substitutions</h3>
         <div id="subs_list"></div>
         <div id="bottom_btn_container">
-            <button id="add_sub" class="btn add-btn">Add Substitution</button>
-            <button id="save_btn" class="btn save-btn">Save</button>
-            <span id="save_msg" class="save-msg" aria-live="polite"></span>
+            <div class="add-save-btn-container">
+                <button id="add_sub" class="btn add-btn">Add Substitution</button>
+                <button id="save_btn" class="btn save-btn">Save</button>
+                <span id="save_msg" class="save-msg" aria-live="polite"></span>
+            </div>
+            <div class="import-export-btn-container">
+                <button id="import_btn" class="btn import-btn">Import</button>
+                <input id="import_input" type="file" style="display: none;">
+                <button id="export_all_btn" class="btn export-all-btn">Export All</button>
+            </div>
         </div>
         <script src="options.js"></script>
     </body>
