@@ -17,6 +17,7 @@ let saveMsgTimeoutId = null;
 
 /**
  * Renders the list of substitution forms based on the current substitutions array.
+ * @returns {void}
  */
 const renderSubstitutions = () => {
   substitutionsList.innerHTML = '';
@@ -30,6 +31,7 @@ const renderSubstitutions = () => {
 /**
  * Stores the current form values to the substitutions array without saving to storage.
  * This allows re-rendering without losing unsaved changes.
+ * @returns {void}
  */
 const storeFormsData = () => {
   const subForms = document.querySelectorAll('[data-index]');
@@ -40,6 +42,7 @@ const storeFormsData = () => {
 
 /**
  * Loads the substitutions from storage (if any) and renders them.
+ * @returns {void}
  */
 const loadSubstitutionsAndRenderFromStorage = () => {
   browserApi.storage.local.get('li_rad_libs_subs', (data) => {
@@ -48,12 +51,22 @@ const loadSubstitutionsAndRenderFromStorage = () => {
   });
 };
 
+/**
+ * Gets the current date and time string for file names.
+ * @returns {string} The current date and time formatted as YYYYMMDDHHMMSS.
+ */
 const getCurrentDateTimeString = () => {
     const date = new Date();
     const pad = (num) => String(num).padStart(2, '0');
     return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
 }
 
+/**
+ * Export an object as a JSON file with a timestamped filename.
+ * @param {Object} obj the object to export to a JSON file.
+ * @param {String} fileNamePrefix the prefix to use for the generated JSON file name.
+ * @returns {void}
+ */
 const exportObject = (obj, fileNamePrefix) => {
   const jsonString = JSON.stringify(obj, null, 2);
   const blob = new Blob([jsonString], { type: 'application/json' });
@@ -70,10 +83,21 @@ const exportObject = (obj, fileNamePrefix) => {
   URL.revokeObjectURL(url);
 };
 
+/**
+ * Exports a single substitution object as a JSON file with a timestamped filename.
+ * @param {Object} sub the substitution object to export.
+ * @param {Number} index the index of the substitution in the list.
+ * @returns {void}
+ */
 const exportSubstitution = (sub, index) => {
   exportObject(sub, `lirl_${index}`);
 };
 
+/**
+ * Parses a raw replacements string into an array of individual replacement strings.
+ * @param {String} rawReplacements the raw replacements string (newline-separated).
+ * @returns {Array<String>} an array of individual replacement strings.
+ */
 const getReplacementArray = (rawReplacements) => {
   return rawReplacements
     .split('\n')
@@ -83,9 +107,9 @@ const getReplacementArray = (rawReplacements) => {
 
 /**
  * Creates a form for a single substitution configuration.
- * @param {Object} sub the existing substitution data (if any)
- * @param {Number} index the index of the substitution in the list
- * @returns the container element for the substitution form
+ * @param {Object} sub the existing substitution data (if any).
+ * @param {Number} index the index of the substitution in the list.
+ * @returns {HTMLElement} the container element for the substitution form.
  */
 const createSubstitutionForm = (sub, index) => {
   // The main substitution container
@@ -314,6 +338,11 @@ const createSubstitutionForm = (sub, index) => {
   return container;
 };
 
+/**
+ * Validates a substitution object.
+ * @param {Object} sub the substitution object to validate.
+ * @returns {Boolean} true if the substitution is valid, false otherwise.
+ */
 const isValidSubstitution = (sub) => {
   if (isNaN(sub.probability) || sub.probability < 0 || sub.probability > 100) return false;
   if (!sub.target) return false;
@@ -321,7 +350,11 @@ const isValidSubstitution = (sub) => {
   return true;
 };
 
-const saveSubstitutions = () => {
+/**
+ * Saves all substitution forms to local storage.
+ * @returns {void} 
+ */
+const saveSubstitutionsToStorage = () => {
   const subForms = document.querySelectorAll('[data-index]');
   let hasInvalidTarget = false;
   let hasInvalidReplacements = false;
@@ -398,7 +431,7 @@ addSubBtn.addEventListener('click', () => {
 });
 
 saveBtn.addEventListener('click', () => {
-  saveSubstitutions();
+  saveSubstitutionsToStorage();
 });
 
 importBtn.addEventListener('click', () => {
@@ -445,4 +478,5 @@ exportAllBtn.addEventListener('click', () => {
   exportObject(substitutions, 'lirl_all');
 });
 
+// Start by loading substitutions from storage and rendering them.
 loadSubstitutionsAndRenderFromStorage();
